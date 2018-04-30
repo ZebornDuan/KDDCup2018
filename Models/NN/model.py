@@ -4,6 +4,7 @@ from tensorflow.python.ops import variable_scope
 from tensorflow.python.framework import dtypes
 import numpy as np
 import copy
+import dataset
 
 def seq2seq(feed_previous=False, input_dim=1, output_dim=1, input_length=120,
     output_length=48, hidden_dim=64, stacked_layers=2, GRADIENT_CLIPPING=2.5):
@@ -81,8 +82,23 @@ if __name__ == '__main__':
 
     with tf.Session() as session:
         session.run(tf.global_variables_initializer())
-        feed = {X[t]:np.random.rand(10, 1) for t in range(120)}
-        feed.update({y[t]: np.random.rand(10, 1) for t in range(48)})
-        session.run(optimizer, feed_dict=feed)
-        print('finish')
-
+        d = dataset.generate()
+        n = 0
+        while True:
+            try:
+                n += 1
+                x_, y_ = d.next()
+                feed = {X[t]:x_.reshape((-1, 120))[:,t].reshape((-1, 1)) for t in range(120)}
+                feed.update({y[t]: y_.reshape((-1, 48))[:,t].reshape((-1, 1)) for t in range(48)})
+                _, l = session.run([optimizer, loss], feed_dict=feed)
+                if n % 50 == 0:
+                    print("loss after %d iteractions : %.3f" %(n ,l))
+                    saver = tf.train.Saver()
+                    save_path = saver.save(session, './save/iteraction%d' % (n))
+                    print("Checkpoint saved at: ", save_path)
+            except:
+                print("loss after %d iteractions : %.3f" %(n ,l))
+                saver = tf.train.Saver()
+                save_path = saver.save(session, 'iteraction%d' % (n))
+                print("Checkpoint saved at: ", save_path)
+                break

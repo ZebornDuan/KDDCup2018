@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
 
-path = 'E:/working/DataMining/{}'
+path = '/home/duanchx/KDDCup2018/{}'
 
-aq = pd.read_csv(path.format('beijing_17_18_aq_cleaned.csv'))
+aq = pd.read_csv(path.format('fangshan.csv'))
 array = np.array(aq['PM2.5'])
 
-batch_size = 20
+batch_size = 50
 
 def generate():
 	x = np.array([])
