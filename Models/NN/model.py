@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.contrib import rnn
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.framework import dtypes
+import numpy as np
 import copy
 
 def seq2seq(feed_previous=False, input_dim=1, output_dim=1, input_length=120,
@@ -80,4 +81,8 @@ if __name__ == '__main__':
 
     with tf.Session() as session:
         session.run(tf.global_variables_initializer())
-        
+        feed = {X[t]:np.random.rand(10, 1) for t in range(120)}
+        feed.update({y[t]: np.random.rand(10, 1) for t in range(48)})
+        session.run(optimizer, feed_dict=feed)
+        print('finish')
+
