@@ -126,7 +126,7 @@ files={'files': open('E:/sample_submission.csv','rb')}
  
 data = {
     "user_id": "dcx15",   #user_id is your username which can be found on the top-right corner on our website when you logged in.
-    "team_token": "c6538eb842d4bc737b95e09bd04f058f09f8209df94111fa2da5a1122034cc50", #your team_token.
+    "team_token": "", #your team_token.
     "description": 'submission',  #no more than 40 chars.
     "filename": "sample_submission.csv", #your filename
 }
@@ -140,6 +140,10 @@ print(response.text)
 
 # In[ ]:
 
+import os
+
+os.remove('E:/bj_airquality_%s-0-%s-23.csv' % (fromday, yesterday))
+os.remove('E:/ld_airquality_%s-0-%s-23.csv' % (fromday, yesterday))
 
 
 
