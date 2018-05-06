@@ -3,12 +3,13 @@ import pandas as pd
 
 path = '/home/duanchx/KDDCup2018/{}'
 
-aq = pd.read_csv(path.format('fangshan.csv'))
-array = np.array(aq['PM2.5'])
 
-batch_size = 50
 
-def generate():
+batch_size = 100
+
+def generate(where, which):
+	aq = pd.read_csv(path.format('%s.csv' % where))
+	array = np.array(aq[which])
 	x = np.array([])
 	y = np.array([])
 	n = 0

@@ -53,6 +53,8 @@ data = data.rename(columns = {'PM2.5 (ug/m3)': 'PM2.5', 'PM10 (ug/m3)':'PM10'})
 
 data_set = set(data['station_id'].value_counts().to_dict().keys())
 
+
+
 for station in data_set:
     aq_station = data[data['station_id'] == station]
     aq_station.to_csv('E:/working/DataMining/%s.csv' % station)

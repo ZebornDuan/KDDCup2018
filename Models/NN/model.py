@@ -6,6 +6,19 @@ import numpy as np
 import copy
 import dataset
 
+bj = ['qianmen_aq', 'miyun_aq', 'yongledian_aq', 'dongsihuan_aq', 
+    'fengtaihuayuan_aq', 'dingling_aq', 'daxing_aq', 'huairou_aq', 
+    'zhiwuyuan_aq', 'mentougou_aq', 'tongzhou_aq', 'yufa_aq', 
+    'guanyuan_aq', 'nansanhuan_aq', 'gucheng_aq', 'shunyi_aq', 
+    'wanliu_aq', 'aotizhongxin_aq', 'dongsi_aq', 'liulihe_aq', 
+    'pingchang_aq', 'badaling_aq', 'xizhimenbei_aq', 'yongdingmennei_aq', 
+    'miyunshuiku_aq', 'tiantan_aq', 'yanqin_aq', 'yungang_aq', 
+    'beibuxinqu_aq', 'nongzhanguan_aq', 'yizhuang_aq', 
+    'donggaocun_aq', 'fangshan_aq', 'wanshouxigong_aq', 'pinggu_aq',
+]
+
+ld = ['CD1', 'BL0', 'GR4', 'MY7', 'HV1', 'GN3', 'GR9', 'LW2', 'GN0', 'KF1', 'CD9', 'ST5', 'TH4']
+
 def seq2seq(feed_previous=False, input_dim=1, output_dim=1, input_length=120,
     output_length=48, hidden_dim=64, stacked_layers=2, GRADIENT_CLIPPING=2.5):
 
@@ -79,26 +92,36 @@ if __name__ == '__main__':
         optimizer = tf.contrib.layers.optimize_loss(loss=loss, learning_rate=0.01,
                 global_step=global_step, optimizer='Adam', clip_gradients=2.5)
         # parameter learning_rate clip_gradients
-
-    with tf.Session() as session:
-        session.run(tf.global_variables_initializer())
-        d = dataset.generate()
-        n = 0
-        while True:
-            try:
-                n += 1
-                x_, y_ = d.next()
-                feed = {X[t]:x_.reshape((-1, 120))[:,t].reshape((-1, 1)) for t in range(120)}
-                feed.update({y[t]: y_.reshape((-1, 48))[:,t].reshape((-1, 1)) for t in range(48)})
-                _, l = session.run([optimizer, loss], feed_dict=feed)
-                if n % 50 == 0:
-                    print("loss after %d iteractions : %.3f" %(n ,l))
-                    saver = tf.train.Saver()
-                    save_path = saver.save(session, './save/iteraction%d' % (n))
-                    print("Checkpoint saved at: ", save_path)
-            except:
-                print("loss after %d iteractions : %.3f" %(n ,l))
-                saver = tf.train.Saver()
-                save_path = saver.save(session, 'iteraction%d' % (n))
-                print("Checkpoint saved at: ", save_path)
-                break
+    bj_air = ['PM2.5', 'PM10', 'O3']
+    ld_air = ['PM2.5', 'PM10']
+    bj.extend(ld)
+    for where in bj:
+        if where in ld:
+            air = ld_air
+        else:
+            air = bj_air
+        for which in air:
+            print('-------------------------------------------')
+            print(where, which)
+            with tf.Session() as session:
+                session.run(tf.global_variables_initializer())
+                d = dataset.generate(where, which)
+                n = 0
+                while True:
+                    try:
+                        n += 1
+                        x_, y_ = d.next()
+                        feed = {X[t]:x_.reshape((-1, 120))[:,t].reshape((-1, 1)) for t in range(120)}
+                        feed.update({y[t]: y_.reshape((-1, 48))[:,t].reshape((-1, 1)) for t in range(48)})
+                        _, l = session.run([optimizer, loss], feed_dict=feed)
+                        if n % 50 == 0:
+                            print("loss after %d iteractions : %.3f" %(n ,l))
+                            saver = tf.train.Saver()
+                            save_path = saver.save(session, './save/iteraction_%s_%s_%d' % (where[:-3], which, n))
+                            print("Checkpoint saved at: ", save_path)
+                    except:
+                        print("loss after %d iteractions : %.3f" %(n ,l))
+                        saver = tf.train.Saver()
+                        save_path = saver.save(session, 'iteraction%d' % (n))
+                        print("Checkpoint saved at: ", save_path)
+                        break
