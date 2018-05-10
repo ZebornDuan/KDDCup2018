@@ -95,7 +95,7 @@ if __name__ == '__main__':
     bj_air = ['PM2.5', 'PM10', 'O3']
     ld_air = ['PM2.5', 'PM10']
     bj.extend(ld)
-    for where in bj:
+    for where in ld:
         if where in ld:
             air = ld_air
         else:
@@ -117,7 +117,10 @@ if __name__ == '__main__':
                         if n % 50 == 0:
                             print("loss after %d iteractions : %.3f" %(n ,l))
                             saver = tf.train.Saver()
-                            save_path = saver.save(session, './save/iteraction_%s_%s_%d' % (where[:-3], which, n))
+                            if (len(where)) > 3:
+                                save_path = saver.save(session, './save/iteraction_%s_%s_%d' % (where[:-3], which, n))
+                            else:
+                                save_path = saver.save(session, './save/iteraction_%s_%s_%d' % (where, which, n))
                             print("Checkpoint saved at: ", save_path)
                     except:
                         print("loss after %d iteractions : %.3f" %(n ,l))

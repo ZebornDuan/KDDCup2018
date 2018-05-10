@@ -3,9 +3,7 @@ import pandas as pd
 
 path = '/home/duanchx/KDDCup2018/{}'
 
-
-
-batch_size = 100
+batch_size = 30
 
 def generate(where, which):
 	aq = pd.read_csv(path.format('%s.csv' % where))
@@ -18,6 +16,7 @@ def generate(where, which):
 		y_ = array[i + 120: i + 168]
 		x = np.append(x, x_)
 		y = np.append(y, y_)
+		n += 1
 		if n % batch_size == 0:
 			yield x, y
 			x = np.array([])

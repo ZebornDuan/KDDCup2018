@@ -8,6 +8,7 @@ import requests
 import pandas as pd
 import numpy as np
 import datetime
+import math
 
 today = datetime.date.today()
 
@@ -64,11 +65,11 @@ for station in df_set:
     aq = df[df['station_id'] == station]
     for p in ['PM2.5', 'PM10', 'O3']:
         array = np.array(aq[p])[-120:]
-        grid = joblib.load('E:/working/DataMining/%s_%s.pkl' % ('dongsi_aq', 'PM2.5'))
+        grid = joblib.load('E:/working/DataMining/%s_%s.pkl' % (station, p))
         y = grid.predict(np.expand_dims(array, axis=0))
         for i in range(48):
             try:
-                s.loc[s[s['test_id'] == '%s#%d' % (station, i)].index[0], p] = y[0][i] if y[0][i] > 0 else 0
+                s.loc[s[s['test_id'] == '%s#%d' % (station, i)].index[0], p] = y[0][i] if y[0][i] > 0 else abs(y[0][i])
             except:
                 print(station, i)
 # s.head()
@@ -104,11 +105,11 @@ for station in df_set:
     aq = df[df['station_id'] == station]
     for p in ['PM2.5', 'PM10']:
         array = np.array(aq[p])[-120:]
-        grid = joblib.load('E:/working/DataMining/%s_%s.pkl' % ('dongsi_aq', 'PM2.5'))
+        grid = joblib.load('E:/working/DataMining/%s_%s.pkl' % (station, p))
         y = grid.predict(np.expand_dims(array, axis=0))
         for i in range(48):
             try:
-                s.loc[s[s['test_id'] == '%s#%d' % (station, i)].index[0], p] = y[0][i] if y[0][i] > 0 else 0
+                s.loc[s[s['test_id'] == '%s#%d' % (station, i)].index[0], p] = y[0][i] if y[0][i] > 0 else abs(y[0][i])
             except:
                 print(station, i)
 
@@ -126,7 +127,7 @@ files={'files': open('E:/sample_submission.csv','rb')}
  
 data = {
     "user_id": "dcx15",   #user_id is your username which can be found on the top-right corner on our website when you logged in.
-    "team_token": "", #your team_token.
+    "team_token": "c6538eb842d4bc737b95e09bd04f058f09f8209df94111fa2da5a1122034cc50", #your team_token.
     "description": 'submission',  #no more than 40 chars.
     "filename": "sample_submission.csv", #your filename
 }
