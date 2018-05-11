@@ -5,6 +5,8 @@ path = '/home/duanchx/KDDCup2018/{}'
 
 batch_size = 30
 
+normalization = {'PM2.5': 1000.0, 'PM10': 3000.0, 'O3': 300}
+
 def generate(where, which):
 	aq = pd.read_csv(path.format('%s.csv' % where))
 	array = np.array(aq[which])
@@ -18,7 +20,7 @@ def generate(where, which):
 		y = np.append(y, y_)
 		n += 1
 		if n % batch_size == 0:
-			yield x, y
+			yield x / normalization[which], y / normalization[which]
 			x = np.array([])
 			y = np.array([])
 			n = 0
