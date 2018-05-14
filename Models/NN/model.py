@@ -95,7 +95,7 @@ if __name__ == '__main__':
     bj_air = ['PM2.5', 'PM10', 'O3']
     ld_air = ['PM2.5', 'PM10']
     bj.extend(ld)
-    for where in ld:
+    for where in bj:
         if where in ld:
             air = ld_air
         else:

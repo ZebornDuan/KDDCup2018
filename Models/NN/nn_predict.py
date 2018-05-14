@@ -29,16 +29,21 @@ df_set = set(df['station_id'].value_counts().to_dict().keys())
 
 X, y, predict, global_step = seq2seq()
 
+normalization = {'PM2.5': 1000.0, 'PM10': 3000.0, 'O3': 300}
+
 for station in df_set:
     aq = df[df['station_id'] == station]
     for p in ['PM2.5', 'PM10', 'O3']:
-        array = np.array(aq[p])[-120:]
+        array = np.array(aq[p])[-120:] / normalization[p]
         x_ = np.expand_dims(array, axis=0)
-        save_weight = './save/iteraction_%s_%s_150' % (station[:-3], p)
-        # try:
-        # 	open(save_weight, 'r')
-        # except IOError:
-        # 	save_weight = './save/iteraction_%s_%s_150' % (station[:-3], p)
+        save_weight = './save/iteraction_%s_%s_250' % (station[:-3], p)
+        try:
+        	open(save_weight, 'r')
+        except IOError:
+            try:
+        	   save_weight = './save/iteraction_%s_%s_200' % (station[:-3], p)
+            except IOError:
+               save_weight = './save/iteraction_%s_%s_150' % (station[:-3], p)
         with tf.Session() as session:
             session.run(tf.global_variables_initializer())
             saver = tf.train.Saver()
@@ -46,10 +51,11 @@ for station in df_set:
             feed = {X[t]:x_.reshape((-1, 120))[:,t].reshape((-1, 1)) for t in range(120)}
             feed.update({y[t]: np.array([0.0]).reshape((-1, 1)) for t in range(48)})
             y_predict = session.run(predict, feed_dict=feed)
-            print(y_predict)
+            # print(y_predict)
             y_predict = [np.expand_dims(p_, axis=1) for p_ in y_predict]
             y_predict = np.concatenate(y_predict, axis=1).reshape(48)
-            # print(y_predict)
+            y_predict = y_predict * normalization[p]
+            print(y_predict)
             for i in range(48):
                 try:
                 	s.loc[s[s['test_id'] == '%s#%d' % (station, i)].index[0], p] = y_predict[i] if y_predict[i] > 0 else abs(y_predict[i])
@@ -74,20 +80,21 @@ df_set = ['CD1', 'BL0', 'GR4', 'MY7', 'HV1', 'GN3', 'GR9', 'LW2', 'GN0', 'KF1', 
 for station in df_set:
     aq = df[df['station_id'] == station]
     for p in ['PM2.5', 'PM10']:
-        array = np.array(aq[p])[-120:]
+        array = np.array(aq[p])[-120:] / normalization[p]
         x_ = np.expand_dims(array, axis=0)
         with tf.Session() as session:
             session.run(tf.global_variables_initializer())
             saver = tf.train.Saver()
             try:
-            	saver.restore(session, './save/iteraction_%s_%s_250' % (station, p))
+            	saver.restore(session, './save/iteraction_%s_%s_350' % (station, p))
             except:
-            	saver.restore(session, './save/iteraction_%s_%s_150' % (station, p))
+            	saver.restore(session, './save/iteraction_%s_%s_300' % (station, p))
             feed = {X[t]:x_.reshape((-1, 120))[:,t].reshape((-1, 1)) for t in range(120)}
             feed.update({y[t]: np.array([0.0]).reshape((-1, 1)) for t in range(48)})
             y_predict = session.run(predict, feed_dict=feed)
             y_predict = [np.expand_dims(p_, axis=1) for p_ in y_predict]
             y_predict = np.concatenate(y_predict, axis=1).reshape(48)
+            y_predict = y_predict * normalization[p]
             # print(y_predict)
             for i in range(48):
                 try:
