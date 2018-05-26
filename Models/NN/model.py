@@ -89,7 +89,7 @@ if __name__ == '__main__':
         # parameter lambda l2 regulaization
 
     with tf.variable_scope('optimizer'):
-        optimizer = tf.contrib.layers.optimize_loss(loss=loss, learning_rate=0.01,
+        optimizer = tf.contrib.layers.optimize_loss(loss=loss, learning_rate=0.00001,
                 global_step=global_step, optimizer='Adam', clip_gradients=2.5)
         # parameter learning_rate clip_gradients
     bj_air = ['PM2.5', 'PM10', 'O3']
